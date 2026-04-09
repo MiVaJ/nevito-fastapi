@@ -86,6 +86,25 @@ async def create_user(
     return new_user
 
 
+products_db = {
+    1: {"name": "Smartphone", "price": 50000.0, "category": "Electronics"},
+    2: {"name": "Laptop", "price": 100000.0, "category": "Electronics"},
+    3: {"name": "Coffee Maker", "price": 15000.0, "category": "Appliances"},
+    4: {"name": "Headphones", "price": 12000.0, "category": "Electronics"},
+    5: {"name": "Smart Watch", "price": 25000.0, "category": "Electronics"},
+    6: {"name": "Blender", "price": 8000.0, "category": "Appliances"},
+    7: {"name": "Mechanical Keyboard", "price": 9000.0, "category": "Accessories"},
+    8: {"name": "Gaming Mouse", "price": 5000.0, "category": "Accessories"},
+    9: {"name": "Monitor", "price": 35000.0, "category": "Electronics"},
+    10: {"name": "Vacuum Cleaner", "price": 20000.0, "category": "Appliances"},
+}
+
+
+def check_product_exists(product_id: int):
+    if product_id not in products_db:
+        raise HTTPException(status_code=404, detail="Product not found")
+
+
 @app.get("/products", tags=["Домашнее задание от 28.03.2026"])
 async def search_products(
     category: Annotated[
