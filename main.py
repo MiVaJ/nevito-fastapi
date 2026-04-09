@@ -12,6 +12,10 @@ app = FastAPI(
             "name": "Домашнее задание от 29.03.2026",
             "description": "Работа с пользователями: создание, получение списка",
         },
+        {
+            "name": "Домашнее задание от 04-05.04.2026",
+            "description": "CRUD для товаров",
+        },
     ]
 )
 
@@ -105,7 +109,11 @@ def check_product_exists(product_id: int):
         raise HTTPException(status_code=404, detail="Product not found")
 
 
-@app.get("/products", tags=["Домашнее задание от 28.03.2026"])
+# GET /products — список всех товаров (с лимитированной выдачей: limit)
+@app.get(
+    "/products",
+    tags=["Домашнее задание от 28.03.2026", "Домашнее задание от 04-05.04.2026"],
+)
 async def search_products(
     category: Annotated[
         str | None, Query(min_length=3, pattern="^[a-zA-Zа-яА-Я]+$")
@@ -113,15 +121,100 @@ async def search_products(
     min_price: Annotated[float | None, Query(ge=0, le=1000000)] = None,
     max_price: float | None = None,
     in_stock: bool | None = None,
+    limit: Annotated[int, Query(ge=1, le=100, description="Лимит выдачи товаров")] = 3,
 ) -> dict:
     if max_price is not None and min_price is not None and max_price <= min_price:
         return {"detail": "max_price должен быть больше min_price"}
+    products_list = [{"id": key} | value for key, value in products_db.items()]
+    result_products = products_list[:limit]
     return {
-        "products": [],
+        "products": result_products,
         "filters": {
             "category": category,
             "min_price": min_price,
             "max_price": max_price,
             "in_stock": in_stock,
+            "limit": limit,
         },
     }
+
+
+# GET /products/{id} — конкретный товар
+@app.get("/products/{id}", tags=["Домашнее задание от 04-05.04.2026"])
+async def get_product(
+    id: Annotated[int, Path(ge=1, description="ID продукта")],
+) -> dict:
+    check_product_exists(id)
+    return {"id": id} | products_db[id]
+
+
+# POST /products — создать товар
+@app.post(
+    "/products",
+    status_code=status.HTTP_201_CREATED,
+    tags=["Домашнее задание от 04-05.04.2026"],
+)
+async def create_product(
+    name: Annotated[str, Body(min_length=1, description="Название товара")],
+    price: Annotated[float, Body(ge=0, description="Стоимость товара")],
+    category: Annotated[str, Body(min_length=3, description="Категория товара")],
+) -> dict:
+    for p in products_db.values():
+        if p["name"] == name:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="Product already exists"
+            )
+
+    new_index = max(products_db) + 1 if products_db else 1
+    new_product = {"name": name, "price": price, "category": category}
+    products_db[new_index] = new_product
+    return new_product
+
+
+# PUT /products/{id} — полное обновление
+@app.put("/products/{id}", tags=["Домашнее задание от 04-05.04.2026"])
+async def update_product(
+    id: Annotated[int, Path(ge=1)],
+    name: Annotated[str, Body()],
+    price: Annotated[float, Body(ge=0)],
+    category: Annotated[str, Body()],
+) -> dict:
+    check_product_exists(id)
+    products_db[id] = {"name": name, "price": price, "category": category}
+    return {"id": id} | products_db[id]
+
+
+# PATCH /products/{id} — частичное обновление
+@app.patch("/products/{id}", tags=["Домашнее задание от 04-05.04.2026"])
+async def patch_product(
+    id: Annotated[int, Path(ge=1)],
+    name: Annotated[str | None, Body()] = None,
+    price: Annotated[float | None, Body(ge=0)] = None,
+    category: Annotated[str | None, Body()] = None,
+) -> dict:
+    check_product_exists(id)
+    # Предотвращаем обновление без указания данных
+    if all(v is None for v in (name, price, category)):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="You must update at least one field",
+        )
+
+    stored_item = products_db[id]
+
+    if name is not None:
+        stored_item["name"] = name
+    if price is not None:
+        stored_item["price"] = price
+    if category is not None:
+        stored_item["category"] = category
+
+    return {"id": id} | stored_item
+
+
+# DELETE /products/{id} — удаление
+@app.delete("/products/{id}", tags=["Домашнее задание от 04-05.04.2026"])
+async def delete_product(id: Annotated[int, Path(ge=1)]):
+    check_product_exists(id)
+    del products_db[id]
+    return {"detail": f"Товар {id} удален"}
