@@ -90,7 +90,7 @@ async def create_user(
     return new_user
 
 
-products_db = {
+products_db: dict[int, dict[str, str | float]] = {
     1: {"name": "Smartphone", "price": 50000.0, "category": "Electronics"},
     2: {"name": "Laptop", "price": 100000.0, "category": "Electronics"},
     3: {"name": "Coffee Maker", "price": 15000.0, "category": "Appliances"},
@@ -115,28 +115,10 @@ def check_product_exists(product_id: int):
     tags=["Домашнее задание от 28.03.2026", "Домашнее задание от 04-05.04.2026"],
 )
 async def search_products(
-    category: Annotated[
-        str | None, Query(min_length=3, pattern="^[a-zA-Zа-яА-Я]+$")
-    ] = None,
-    min_price: Annotated[float | None, Query(ge=0, le=1000000)] = None,
-    max_price: float | None = None,
-    in_stock: bool | None = None,
     limit: Annotated[int, Query(ge=1, le=100, description="Лимит выдачи товаров")] = 3,
-) -> dict:
-    if max_price is not None and min_price is not None and max_price <= min_price:
-        return {"detail": "max_price должен быть больше min_price"}
+):
     products_list = [{"id": key} | value for key, value in products_db.items()]
-    result_products = products_list[:limit]
-    return {
-        "products": result_products,
-        "filters": {
-            "category": category,
-            "min_price": min_price,
-            "max_price": max_price,
-            "in_stock": in_stock,
-            "limit": limit,
-        },
-    }
+    return products_list[:limit]
 
 
 # GET /products/{id} — конкретный товар
