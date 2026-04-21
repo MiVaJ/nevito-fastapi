@@ -1,6 +1,7 @@
 from typing import Annotated
 
 from fastapi import FastAPI, HTTPException, Path, Query, status
+from fastapi.staticfiles import StaticFiles
 
 import schemas
 
@@ -20,6 +21,9 @@ app = FastAPI(
         },
     ]
 )
+
+
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 
 @app.get("/calculate")
