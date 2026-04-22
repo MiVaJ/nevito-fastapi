@@ -39,3 +39,10 @@ class UserCreate(UserBase):
 
 class UserResponse(UserBase):
     id: int
+
+
+class MessageRead(BaseModel):
+    id: Annotated[int, Field(ge=1, description="Уникальный идентификатор")]
+    content: Annotated[
+        str, Field(min_length=1, max_length=5000, description="Текст сообщения")
+    ]
