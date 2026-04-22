@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Редактирование сообщения #{{ message.id }}</h1>
+    <form action="/web/messages/{{ message.id }}" method="post">
+        <div class="form-group">
+            <label for="content">Текст сообщения:</label><br>
+            <textarea id="content" name="content" rows="5" style="width: 100%;">{{ message.content }}</textarea>
+        </div>
+        <br>
+        <button type="submit" class="btn btn-primary">Сохранить изменения</button>
+        <a href="/web/messages">Отмена</a>
+    </form>
+{% endblock %}

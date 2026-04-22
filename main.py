@@ -1,7 +1,9 @@
 from typing import Annotated
 
-from fastapi import FastAPI, HTTPException, Path, Query, status
+from fastapi import FastAPI, HTTPException, Path, Query, Form, status, Request
 from fastapi.staticfiles import StaticFiles
+
+from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
 
 import schemas
@@ -20,6 +22,10 @@ app = FastAPI(
         {
             "name": "Домашнее задание от 04-05.04.2026",
             "description": "CRUD для товаров",
+        },
+        {
+            "name": "Домашнее задание от 11-12.04.2026",
+            "description": "Фронтенд на Jinja2: работа с сообщениями",
         },
     ]
 )
@@ -193,3 +199,48 @@ async def delete_product(id: Annotated[int, Path(ge=1)]):
     check_product_exists(id)
     del products_db[id]
     return {"detail": f"Товар {id} удален"}
+
+
+# GET /web/messages - получить список всех сообщений
+@app.get(
+    "/web/messages",
+    response_class=HTMLResponse,
+    tags=["Домашнее задание от 11-12.04.2026"],
+)
+async def list_messages(request: Request):
+    return templates.TemplateResponse(
+        request=request,
+        name="index.html",
+        context={"request": request, "messages": messages_db},
+    )
+
+
+# GET /web/messages/{message_id}/edit - получить страницу с обновлением сообщения
+@app.get(
+    "/web/messages/{message_id}/edit",
+    response_class=HTMLResponse,
+    tags=["Домашнее задание от 11-12.04.2026"],
+)
+async def edit_message_form(request: Request, message_id: int):
+    message = next((m for m in messages_db if m.id == message_id), None)
+
+    if not message:
+        raise HTTPException(status_code=404, detail="Сообщение не найдено")
+
+    return templates.TemplateResponse(
+        request=request, name="edit.html", context={"message": message}
+    )
+
+
+# POST /web/messages/{message_id} - обновление сообщения
+@app.post("/web/messages/{message_id}", tags=["Домашнее задание от 11-12.04.2026"])
+async def update_message(message_id: int, content: Annotated[str, Form()]):
+    for i, m in enumerate(messages_db):
+        if m.id == message_id:
+            updated_message = schemas.MessageRead(id=message_id, content=content)
+
+            messages_db[i] = updated_message
+
+            return RedirectResponse(url="/web/messages", status_code=303)
+
+    raise HTTPException(status_code=404, detail="Message not found")

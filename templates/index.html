@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Список сообщений</h1>
+    <div class="message-list">
+        {% for msg in messages %}
+        <div style="border: 1px solid #ccc; padding: 10px; margin-bottom: 10px;">
+            <p>{{ msg.content }}</p>
+            <a href="/web/messages/{{ msg.id }}/edit">Редактировать</a>
+        </div>
+        {% endfor %}
+    </div>
+{% endblock %}

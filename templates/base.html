@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="ru">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{% block title %}My App{% endblock %}</title>
+        <link rel="stylesheet" href="{{ url_for('static', path='/css/style.css') }}">
+    </head>
+    <body>
+        <header class="navbar">
+            <div class="container">
+                <a href="/web/messages" class="logo">💬 Сообщения</a>
+            </div>
+        </header>
+
+        <main class="container">
+            {% block content %}{% endblock %}
+        </main>
+
+        <footer class="container">
+            <hr>
+            <p style="color: #64748b; font-size: 0.8rem;">&copy; Все права защищены</p>
+        </footer>
+    </body>
+</html>
