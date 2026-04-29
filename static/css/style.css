@@ -178,3 +178,32 @@ hr {
     border-top: 1px solid var(--border);
     margin: 1.5rem 0;
 }
+
+/* Цвета для уведомлений */
+.custom-toast.success { border-left: 5px solid #22c55e; } /* Зеленый - Создание/Обновление */
+.custom-toast.info { border-left: 5px solid #3b82f6; }    /* Синий - Загрузка */
+.custom-toast.warning { border-left: 5px solid #f59e0b; } /* Оранжевый - Редактирование */
+.custom-toast.danger { border-left: 5px solid #ef4444; }  /* Красный - Удаление */
+
+#toast-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 9999;
+}
+
+.custom-toast {
+    background: #1e293b;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 8px;
+    margin-top: 10px;
+    min-width: 200px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    animation: toastSlideIn 0.3s ease-out;
+}
+
+@keyframes toastSlideIn {
+    from { transform: translateX(100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+}

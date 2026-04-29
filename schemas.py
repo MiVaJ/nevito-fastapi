@@ -53,3 +53,11 @@ class MessageCreate(MessageBase):
 
 class MessageRead(MessageBase):
     id: Annotated[int, Field(ge=1, description="Уникальный идентификатор")]
+
+
+class MessageUpdate(MessageCreate):
+    pass
+
+
+class MessagePatch(BaseModel):
+    content: Annotated[str | None, Field(default=None, min_length=1)]

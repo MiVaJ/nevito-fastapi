@@ -1,6 +1,7 @@
 from typing import Annotated
 
 from fastapi import FastAPI, Form, HTTPException, Path, Query, Request, status
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
@@ -30,7 +31,20 @@ app = FastAPI(
             "name": "Домашнее задание от 18-19.04.2026 Jinja",
             "description": "Jinja2: серверный CRUD и HTML-формы",
         },
+        {
+            "name": "Домашнее задание от 18-19.04.2026 JS",
+            "description": "JS: динамический CRUD через Fetch API и JSON",
+        },
     ]
+)
+
+# Настройка CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["null"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 templates = Jinja2Templates(directory="templates")
@@ -280,3 +294,93 @@ async def delete_message(message_id: int):
 
     messages_db.remove(message)
     return RedirectResponse(url="/web/messages", status_code=303)
+
+
+# Вспомогательная функция для генерации нового ID
+def next_id() -> int:
+    return max((m.id for m in messages_db), default=0) + 1
+
+
+# Вспомогательная функция для поиска сообщения по ID
+def get_index(message_id: int) -> int:
+    for i, m in enumerate(messages_db):
+        if m.id == message_id:
+            return i
+    return -1
+
+
+# GET /web/messages-js — открыть страницу с JS-интерфейсом
+@app.get(
+    "/web/messages-js",
+    response_class=HTMLResponse,
+    tags=["Домашнее задание от 18-19.04.2026 JS"],
+)
+async def messages_js_page(request: Request):
+    return templates.TemplateResponse(request=request, name="messages_js.html")
+
+
+# API GET /api/messages — получить список всех сообщений
+@app.get(
+    "/api/messages",
+    response_model=list[schemas.MessageRead],
+    tags=["Домашнее задание от 18-19.04.2026 JS"],
+)
+async def api_get_messages():
+    return messages_db
+
+
+# API POST /api/messages — создать сообщение (принимает JSON, а не форму)
+@app.post(
+    "/api/messages", status_code=201, tags=["Домашнее задание от 18-19.04.2026 JS"]
+)
+async def api_create_message(message: schemas.MessageCreate):
+    new_msg = schemas.MessageRead(id=next_id(), content=message.content)
+    messages_db.append(new_msg)
+    return new_msg
+
+
+# API PUT /api/messages/{message_id} — полное обновление сообщения
+@app.put(
+    "/api/messages/{message_id}",
+    response_model=schemas.MessageRead,
+    tags=["Домашнее задание от 18-19.04.2026 JS"],
+)
+async def api_update_message(message_id: int, message_data: schemas.MessageUpdate):
+    idx = get_index(message_id)
+
+    if idx < 0:
+        raise HTTPException(status_code=404, detail="Message not found")
+
+    updated_msg = schemas.MessageRead(id=message_id, content=message_data.content)
+    messages_db[idx] = updated_msg
+    return updated_msg
+
+
+# API PATCH /api/messages/{message_id} — частичное обновление сообщения
+@app.patch(
+    "/api/messages/{message_id}",
+    response_model=schemas.MessageRead,
+    tags=["Домашнее задание от 18-19.04.2026 JS"],
+)
+async def api_patch_message(message_id: int, message_data: schemas.MessagePatch):
+    idx = get_index(message_id)
+    if idx < 0:
+        raise HTTPException(status_code=404, detail="Message not found")
+
+    if message_data.content is not None:
+        messages_db[idx].content = message_data.content
+    return messages_db[idx]
+
+
+# API DELETE /api/messages/{id} — удалить сообщение
+@app.delete(
+    "/api/messages/{message_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    tags=["Домашнее задание от 18-19.04.2026 JS"],
+)
+async def api_delete_message(message_id: int):
+    message = next((m for m in messages_db if m.id == message_id), None)
+    if not message:
+        raise HTTPException(status_code=404, detail="Message not found")
+    messages_db.remove(message)
+    return {"detail": "Deleted"}

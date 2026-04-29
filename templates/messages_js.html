@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <div class="header-actions">
+        <h1 id="formTitle">Новое сообщение</h1>
+    </div>
+
+    <div class="card">
+        <div class="form-group">
+            <!-- Скрытое поле для ID -->
+            <input type="hidden" id="editId" value="">
+            <label for="messageInput">Текст сообщения</label>
+            <textarea id="messageInput" rows="3" placeholder="Что вы думаете?" required></textarea>
+        </div>
+        <div class="actions">
+            <button onclick="saveMessage()" class="btn btn-primary" id="sendBtn">Опубликовать</button>
+            <button onclick="resetForm()" class="btn btn-secondary" id="cancelBtn" style="display:none;">Отмена</button>
+        </div>
+    </div>
+
+    <hr>
+    <div class="header-actions">
+        <h2>Список сообщений (JS API)</h2>
+    </div>
+
+    <!-- Сюда JS будет вставлять сообщения -->
+    <div id="messagesContainer" class="message-list"></div>
+
+    <!-- Обязательно defer, чтобы скрипт видел все ID выше -->
+    <script src="{{ url_for('static', path='/js/main.js') }}" defer></script>
+{% endblock %}
