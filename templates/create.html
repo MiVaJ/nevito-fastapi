@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>Новое сообщение</h1>
+    <form action="/web/messages" method="post">
+        <div class="form-group">
+            <label for="content">Текст сообщения:</label>
+            <textarea id="content" name="content" rows="5" required placeholder="Введите текст..."></textarea>
+        </div>
+        <div class="message-actions">
+            <button type="submit" class="btn btn-primary">Опубликовать</button>
+            <a href="/web/messages" class="btn btn-secondary">Отмена</a>
+        </div>
+    </form>
+{% endblock %}

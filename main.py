@@ -1,13 +1,12 @@
 from typing import Annotated
 
-from fastapi import FastAPI, HTTPException, Path, Query, Form, status, Request
-from fastapi.staticfiles import StaticFiles
-
+from fastapi import FastAPI, Form, HTTPException, Path, Query, Request, status
 from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
 import schemas
-from database import products_db, users_db, messages_db
+from database import messages_db, products_db, users_db
 
 app = FastAPI(
     openapi_tags=[
@@ -26,6 +25,10 @@ app = FastAPI(
         {
             "name": "Домашнее задание от 11-12.04.2026",
             "description": "Фронтенд на Jinja2: работа с сообщениями",
+        },
+        {
+            "name": "Домашнее задание от 18-19.04.2026 Jinja",
+            "description": "Jinja2: серверный CRUD и HTML-формы",
         },
     ]
 )
@@ -232,6 +235,25 @@ async def edit_message_form(request: Request, message_id: int):
     )
 
 
+# GET /web/messages/create — форма для создания нового сообщения
+@app.get(
+    "/web/messages/create",
+    response_class=HTMLResponse,
+    tags=["Домашнее задание от 18-19.04.2026 Jinja"],
+)
+async def create_message_form(request: Request):
+    return templates.TemplateResponse(request=request, name="create.html", context={})
+
+
+# POST /web/messages — добавление нового сообщения в базу данных
+@app.post("/web/messages", tags=["Домашнее задание от 18-19.04.2026 Jinja"])
+async def create_message(content: Annotated[str, Form()]):
+    new_id = max((m.id for m in messages_db), default=0) + 1
+    new_msg = schemas.MessageRead(id=new_id, content=content)
+    messages_db.append(new_msg)
+    return RedirectResponse(url="/web/messages", status_code=303)
+
+
 # POST /web/messages/{message_id} - обновление сообщения
 @app.post("/web/messages/{message_id}", tags=["Домашнее задание от 11-12.04.2026"])
 async def update_message(message_id: int, content: Annotated[str, Form()]):
@@ -244,3 +266,17 @@ async def update_message(message_id: int, content: Annotated[str, Form()]):
             return RedirectResponse(url="/web/messages", status_code=303)
 
     raise HTTPException(status_code=404, detail="Message not found")
+
+
+# POST /web/messages/{message_id}/delete — удаление сообщения
+@app.post(
+    "/web/messages/{message_id}/delete",
+    tags=["Домашнее задание от 18-19.04.2026 Jinja"],
+)
+async def delete_message(message_id: int):
+    message = next((m for m in messages_db if m.id == message_id), None)
+    if not message:
+        raise HTTPException(status_code=404, detail="Message not found")
+
+    messages_db.remove(message)
+    return RedirectResponse(url="/web/messages", status_code=303)

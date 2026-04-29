@@ -1,7 +1,10 @@
 :root {
     --primary: #2563eb;
+    --primary-hover: #1d4ed8;
+    --danger: #dc2626;
     --bg: #f8fafc;
     --text: #1e293b;
+    --text-muted: #64748b;
     --border: #e2e8f0;
 }
 
@@ -30,6 +33,7 @@ body {
     font-weight: bold;
     text-decoration: none;
     color: var(--primary);
+    font-size: 1.2rem;
 }
 
 .card {
@@ -37,6 +41,7 @@ body {
     padding: 2rem;
     border-radius: 8px;
     border: 1px solid var(--border);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
 .form-group {
@@ -56,6 +61,12 @@ textarea {
     border-radius: 6px;
     box-sizing: border-box;
     font-size: 1rem;
+    font-family: inherit;
+}
+
+textarea:focus {
+    outline: 2px solid var(--primary);
+    outline-offset: -1px;
 }
 
 .actions {
@@ -65,12 +76,15 @@ textarea {
 }
 
 .btn {
+    display: inline-block;
     padding: 0.6rem 1.2rem;
     border-radius: 6px;
     text-decoration: none;
     font-size: 0.9rem;
+    font-weight: 500;
     cursor: pointer;
     border: none;
+    transition: all 0.2s;
 }
 
 .btn-primary {
@@ -78,12 +92,28 @@ textarea {
     color: white;
 }
 
-.btn-secondary {
-    color: #64748b;
+.btn-primary:hover {
+    background: var(--primary-hover);
 }
 
-.btn:hover {
-    opacity: 0.9;
+.btn-secondary {
+    color: var(--text-muted);
+    background: transparent;
+}
+
+.btn-secondary:hover {
+    color: var(--text);
+}
+
+/* Специфический стиль для кнопки удаления */
+.btn-delete {
+    color: var(--danger);
+    background: transparent;
+    padding: 0;
+}
+
+.btn-delete:hover {
+    text-decoration: underline;
 }
 
 .header-actions {
@@ -95,32 +125,50 @@ textarea {
 
 .message-item {
     background: white;
-    padding: 1rem;
+    padding: 1.25rem;
     border-radius: 8px;
     margin-bottom: 1rem;
     border: 1px solid var(--border);
     display: flex;
     justify-content: space-between;
     align-items: center;
+    transition: transform 0.1s;
+}
+
+.message-item:hover {
+    border-color: #cbd5e1;
+}
+
+.message-info p {
+    margin: 0;
+}
+
+.message-links {
+    display: flex;
+    gap: 1rem;
+    align-items: center;
 }
 
 .message-links a {
-    margin-left: 1rem;
     font-size: 0.85rem;
     text-decoration: none;
     color: var(--primary);
+}
+
+.message-links a:hover {
+    text-decoration: underline;
 }
 
 .back-link {
     display: block;
     margin-bottom: 1rem;
     font-size: 0.9rem;
-    color: #64748b;
+    color: var(--text-muted);
     text-decoration: none;
 }
 
 .content-view {
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     white-space: pre-wrap;
     padding: 1rem 0;
 }
