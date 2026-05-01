@@ -2,6 +2,10 @@
 
 Тестовый репозиторий для работы с FastAPI
 
+## Структура проекта
+- `backend/`: API на FastAPI (Python 3.10+)
+- `frontend/`: Клиентское приложение на React (Vite/NPM)
+
 ## Установка и запуск
 
 ### 1. Клонирование репозитория
@@ -25,6 +29,7 @@ pip install -r requirements.txt
 
 ### 4. Запуск приложения
 ```bash
+cd backend
 uvicorn main:app --reload
 ```
 ## Навигация по проекту
@@ -50,16 +55,16 @@ uvicorn main:app --reload
 ### 1. Линтинг и форматирование (Ruff)
 Проверить код на ошибки и отсортировать импорты:
 ```bash
-ruff check . --fix
+ruff check backend/ --fix
 ```
 
 Отформатировать код (привести к единому стилю):
 ```bash
-ruff format .
+ruff format backend/
 ```
 
 ### 2. Проверка типизации (Mypy)
 Проверить корректность аннотаций типов:
 ```bash
-mypy .
+mypy backend/ --config-file backend/pyproject.toml
 ```
