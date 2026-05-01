@@ -7,3 +7,15 @@ __pycache__/
 .pytest_cache/
 .coverage
 htmlcov/
+
+# React / Node
+node_modules/
+dist/
+build/
+.eslintcache
+.stylelintcache
+*.local
+.pnpm-debug.log*
+
+# Vite
+.vite/
